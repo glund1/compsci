@@ -3,14 +3,7 @@ import peasy.*;
 import java.util.*;
 import java.lang.*;
 
-float red = 255;
-float green = 0;
-float blue = 0;
-float alpha;
-int mesh = 1;
-boolean slider = false;
-ControlP5 cp5;
-RadioButton r1;
+
 PeasyCam cam;
 int res = 35;
 PVector[][] points;
@@ -18,7 +11,10 @@ String xEq = "";
 String yEq = "";
 String zEq = "";
 boolean r = false;
-
+float uMin = 0;
+float uMax = TWO_PI;
+float vMin = 0;
+float vMax = TWO_PI;
 void settings() {
   size(800, 800, P3D);
   
@@ -26,7 +22,7 @@ void settings() {
 void setup() {
   
   cam = new PeasyCam(this, 0);
-  points = new PVector[res][res];
+  points = new PVector[100][100];
   String[] args = {"YourSketchNameHere"};
   Grapher sa = new Grapher();
   PApplet.runSketch(args, sa);
@@ -42,7 +38,7 @@ void draw() {
     noStroke();
     fill(red,green,blue,alpha);
   }
-  if(r) {
+  if(r && (!xEq.equals("") && !yEq.equals("") && !zEq.equals(""))) {
     Sphere();
     show();
   }
@@ -50,9 +46,9 @@ void draw() {
  
 void Sphere() {
   for (int i = 0; i<res; i++) {
-    double u = map(i, 0, res, 0, TWO_PI+.25);
+    double u = map(i, 0, res, uMin, uMax+.25);
     for (int j = 0; j<res; j++) {
-      double v = map(j, 0, res, 0, TWO_PI+.25);
+      double v = map(j, 0, res, vMin, vMax+.25);
       float x = (float)eval(postFix(xEq,u,v));
       float y = (float)eval(postFix(yEq,u,v));
       float z = (float)eval(postFix(zEq,u,v));
@@ -67,10 +63,12 @@ void show() {
   for (int i = 0; i<res-1; i++) {
     beginShape(TRIANGLE_STRIP);
     for (int j = 0; j<res; j++) {
+      if(points[i][j]!=null && points[i+1][j]!=null) {
       PVector p = points[i][j];
       vertex(p.x, p.y, p.z);
       PVector p1 = points[i+1][j];
       vertex(p1.x, p1.y, p1.z);
+      }
     }
     endShape();
   }
